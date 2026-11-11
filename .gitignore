@@ -1,0 +1,9 @@
+mempredictc
+mempredictc.exe
+*.o
+*.obj
+*.out
+build/
+Debug/
+Release/
+.vscode/
