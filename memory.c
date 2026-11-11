@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <limits.h>
 #include <string.h>
 
 static AllocationRecord records[MAX_ALLOCATIONS];
@@ -140,7 +141,11 @@ int memory_free(unsigned long id)
     }
 
     free(record->address);
-    stats.total_freed += record->size;
+    if (record->size <= SIZE_MAX - stats.total_freed) {
+        stats.total_freed += record->size;
+    } else {
+        stats.total_freed = SIZE_MAX;
+    }
     stats.current_bytes -= record->size;
     stats.deallocation_operations++;
     stats.active_allocations--;
@@ -156,6 +161,24 @@ const AllocationRecord *memory_find(unsigned long id)
 MemoryStats memory_get_stats(void)
 {
     return stats;
+}
+
+size_t memory_get_active_allocations(AllocationRecord *records_out,
+                                     size_t capacity)
+{
+    size_t i;
+    size_t copied = 0;
+
+    if (records_out == NULL || capacity == 0) {
+        return 0;
+    }
+
+    for (i = 0; i < MAX_ALLOCATIONS && copied < capacity; ++i) {
+        if (records[i].active) {
+            records_out[copied++] = records[i];
+        }
+    }
+    return copied;
 }
 
 void memory_print_dashboard(void)
@@ -183,7 +206,11 @@ void memory_print_leaks(void)
             printf("Allocation ID %lu: %zu bytes unreleased\n",
                    records[i].id, records[i].size);
             outstanding++;
-            bytes += records[i].size;
+            if (records[i].size <= SIZE_MAX - bytes) {
+                bytes += records[i].size;
+            } else {
+                bytes = SIZE_MAX;
+            }
         }
     }
     if (outstanding == 0) {

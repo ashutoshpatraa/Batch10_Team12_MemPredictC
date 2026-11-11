@@ -34,6 +34,9 @@ int memory_reallocate(unsigned long id, size_t new_size);
 int memory_free(unsigned long id);
 const AllocationRecord *memory_find(unsigned long id);
 MemoryStats memory_get_stats(void);
+/* Copies up to capacity active records into caller-owned storage. */
+size_t memory_get_active_allocations(AllocationRecord *records_out,
+                                     size_t capacity);
 void memory_print_dashboard(void);
 void memory_print_leaks(void);
 void memory_release_all(void);

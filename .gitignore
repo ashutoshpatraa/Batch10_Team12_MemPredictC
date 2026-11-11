@@ -4,6 +4,8 @@ mempredictc.exe
 *.obj
 *.out
 build/
+release/MemPredictC.exe
+release/MemPredictC_CLI.exe
 Debug/
 Release/
 .vscode/

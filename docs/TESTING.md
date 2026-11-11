@@ -35,7 +35,39 @@ make
 mempredictc.exe < tests/sample_inputs.txt
 ```
 
+For Windows GUI packaging:
+
+```text
+build.bat
+run.bat
+```
+
+The GUI checklist includes launching the dashboard, resizing the window,
+malloc/calloc/realloc/free controls, prediction updates, graph observations,
+bounded activity log behavior, leak status, and exit cleanup. The same
+`MemoryStats` and `PredictionStats` values drive both the dashboard and the
+core modules.
+
+## Verified results
+
+| Check | Command/action | Result |
+|---|---|---|
+| Compiler diagnosis | `C:\MinGW\bin\gcc.exe -v` | GCC 6.3.0 present; shell PATH did not include `C:\MinGW\bin` |
+| Compiler isolation | Compile and run `hello.c` | PASS; executable linked and ran successfully |
+| CLI build | Strict C11 build to `build\MemPredictC_CLI.exe` | PASS |
+| GUI build | Strict C11 build with `-luser32 -lgdi32` | PASS |
+| Makefile build | `C:\MinGW\bin\mingw32-make.exe -B` | PASS |
+| CLI regression | `build\MemPredictC_CLI.exe < tests\sample_inputs.txt` | PASS; demo, prediction, leak report, and cleanup observed |
+| GUI startup | Launch `build\MemPredictC.exe` | PASS; window remained running during startup check |
+| Screenshot | Capture running dashboard | PASS; [MemPredictC-dashboard.png](../screenshots/MemPredictC-dashboard.png) |
+
+Both executables were copied to `release\`. The current toolchain is
+32-bit MinGW GCC 6.3.0; the dashboard uses only system Win32 libraries.
+
 ## Compiler warnings and known issues
 
-Not yet recorded in this fresh repository. Run with `-Wall -Wextra -Wpedantic`
-and record any warning rather than suppressing it.
+The initial failures occurred because `gcc` was not on the shell `PATH`, and
+the first GUI build also exposed source compatibility issues (`_strtoui64`,
+missing `ULONG_MAX`, and `%zu` diagnostics in the legacy MinGW runtime). The
+build script now detects `C:\MinGW\bin` automatically, and the GUI uses
+standard `strtoull`, `<limits.h>`, and portable explicit formatting.

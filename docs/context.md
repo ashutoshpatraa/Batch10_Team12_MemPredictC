@@ -28,5 +28,6 @@ estimate.
 
 ## Build
 
-`make` builds `mempredictc`; on Windows use `mempredictc.exe`. Direct GCC
-compilation is documented in the root README.
+`make` builds the CLI and the native Windows dashboard when a working GCC is
+available. On Windows, `build.bat` creates `build\MemPredictC.exe` and the CLI
+fallback. The GUI uses Win32 only; no raylib or runtime DLL is required.

@@ -12,6 +12,11 @@
    allocation, prediction, dashboard, and leak reporting.
 7. Exit releases any remaining tracked addresses before returning.
 
+The Windows launcher initializes the same modules through `ui.c`. If window
+creation fails, `gui_main.c` calls the existing `cli_run` entry point instead.
+The dashboard records observations after successful operations and renders
+bounded snapshots; it never accesses the registry's static storage directly.
+
 ## Allocation and deallocation
 
 ```mermaid

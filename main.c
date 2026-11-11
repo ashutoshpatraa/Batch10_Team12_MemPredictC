@@ -138,7 +138,7 @@ static void print_menu(void)
     printf("9. Exit\n");
 }
 
-int main(void)
+int cli_run(void)
 {
     size_t choice;
     size_t steps;
