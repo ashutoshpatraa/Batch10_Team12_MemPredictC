@@ -1,15 +1,19 @@
 @echo off
 setlocal
 
-set "GCC=gcc"
-where gcc >nul 2>nul
-if errorlevel 1 if exist C:\MinGW\bin\gcc.exe set "GCC=C:\MinGW\bin\gcc.exe"
-if "%GCC%"=="gcc" (
+set "GCC="
+if exist "C:\MinGW\bin\gcc.exe" (
+    set "GCC=C:\MinGW\bin\gcc.exe"
+) else (
+    where gcc >nul 2>nul
+    if not errorlevel 1 set "GCC=gcc"
+)
+if not defined GCC (
     echo ERROR: MinGW GCC was not found on PATH.
     echo Install MinGW-w64 or add its bin directory to PATH, then retry.
     exit /b 1
 )
-if "%GCC%"=="C:\MinGW\bin\gcc.exe" set "PATH=C:\MinGW\bin;%PATH%"
+if /I "%GCC%"=="C:\MinGW\bin\gcc.exe" set "PATH=C:\MinGW\bin;%PATH%"
 
 for /f "tokens=*" %%V in ('"%GCC%" --version 2^>^&1') do (
     echo %%V
@@ -28,7 +32,7 @@ if errorlevel 1 (
 )
 
 echo Building native Windows dashboard...
-"%GCC%" -std=c11 -Wall -Wextra -Wpedantic -O2 gui_main.c main.c ui.c memory.c predictor.c -o build\MemPredictC.exe -luser32 -lgdi32
+"%GCC%" -std=c11 -Wall -Wextra -Wpedantic -O2 gui_main.c main.c ui.c memory.c predictor.c -o build\MemPredictC.exe -mwindows -luser32 -lgdi32
 if errorlevel 1 (
     echo ERROR: GUI compilation failed.
     exit /b 1

@@ -8,6 +8,10 @@
 - Added `predictor.c/.h` for the latest 64 observations and average upward trend.
 - Added read-only allocation and prediction snapshots for the Windows UI.
 - Added a native Win32 dashboard and CLI-compatible launcher.
+- Replaced the fixed single-screen dashboard with responsive Dashboard,
+  Allocations, Prediction, Leak Detection, Activity Log, and Settings pages.
+- Added empty graph state, owner-drawn dark navigation/actions, responsive
+  positioning, minimum window size, and DPI-awareness fallback.
 - Added Makefile, `.gitignore`, README, test cases, prompts, and presentation
   materials.
 
@@ -26,10 +30,17 @@ after its bin directory is added to PATH or detected by `build.bat`.
 The dashboard is intentionally native Win32 rather than raylib because no
 raylib installation was available in the checked toolchain. It does not claim
 system-wide monitoring and uses the same tracker and trend predictor as the
-terminal application.
+terminal application. The current UI validation covered the default window,
+1270px width resizing, and maximized 2582x1550 client size.
+
+## Validation completed
+
+The original MinGW PATH issue was fixed in `build.bat`. MinGW GCC 6.3.0 now
+builds both targets, the CLI sample-input regression exits successfully, and
+the GUI starts with the expected native Win32 window. Generated executables are
+copied to both `build/` and `release/`.
 
 ## Pending work
 
-Run the documented build and sample-input regression test after repairing the
-local GCC installation; the current MinGW GCC exits silently before producing
-an executable.
+Optionally replace the older checked-in screenshot with a saved capture of the
+redesigned dashboard, then add verified team member names.

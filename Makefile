@@ -16,7 +16,7 @@ $(CLI_TARGET): $(CLI_SOURCES) memory.h predictor.h
 
 $(GUI_TARGET): $(GUI_SOURCES) cli.h ui.h memory.h predictor.h
 	$(MKDIR_P) build
-	$(CC) $(CFLAGS) $(GUI_SOURCES) -o $(GUI_TARGET) -luser32 -lgdi32
+	$(CC) $(CFLAGS) $(GUI_SOURCES) -o $(GUI_TARGET) -mwindows -luser32 -lgdi32
 
 clean:
 	$(RM) $(TARGET) $(TARGET).exe $(CLI_TARGET) $(GUI_TARGET)

@@ -102,9 +102,11 @@ GCC is not already on `PATH`. It produces `build\MemPredictC.exe` and
 The dashboard is written in [ui.c](ui.c) and uses read-only snapshots from the
 memory and predictor modules. It provides live statistics, a trend graph,
 allocation controls, leak status, prediction output, an activity log, resize
-support, and exit cleanup. `build\MemPredictC.exe` is the GUI output and
-`build\MemPredictC_CLI.exe` is the CLI output. If GUI initialization fails,
-the Windows launcher invokes the CLI.
+support, page navigation, empty states, and exit cleanup. `build\MemPredictC.exe`
+is the GUI output and `build\MemPredictC_CLI.exe` is the CLI output. If GUI
+initialization fails, the Windows launcher invokes the CLI. The minimum window
+size is 1040x680; the layout is calculated from the current client area rather
+than a single fixed dashboard size.
 
 ## Algorithm and pseudocode
 
@@ -169,9 +171,10 @@ Representative test cases include:
 4. Enter zero, text, or an unknown ID and confirm a safe error message.
 5. Run option 7 and confirm the intentional outstanding allocation appears.
 
-The local MinGW GCC installation was found but exited before producing an
-executable during validation. Therefore no runtime output is claimed here;
-see [docs/TESTING.md](docs/TESTING.md) for the exact status.
+Validation completed with MinGW GCC 6.3.0. Both the CLI and native Win32
+executables were built successfully, and the scripted CLI demonstration
+completed with exit code 0. See [docs/TESTING.md](docs/TESTING.md) for the
+commands and observed checks.
 
 ## Limitations and future improvements
 

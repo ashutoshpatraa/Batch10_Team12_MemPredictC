@@ -8,10 +8,9 @@ messages, prediction sufficiency, and leak reporting.
 
 ## Test results
 
-The source was reviewed for the cases below. A genuine compiler/runtime run
-must be performed on the target machine before final submission; this document
-does not invent output. Record the command, compiler version, observed output,
-and PASS/FAIL after that run.
+The cases below were exercised through the CLI regression input and build
+commands. The GUI startup check verifies window initialization; interactive
+control behavior shares the same memory and predictor modules as the CLI.
 
 | ID | Scenario | Expected |
 |---|---|---|
@@ -52,22 +51,47 @@ core modules.
 
 | Check | Command/action | Result |
 |---|---|---|
-| Compiler diagnosis | `C:\MinGW\bin\gcc.exe -v` | GCC 6.3.0 present; shell PATH did not include `C:\MinGW\bin` |
-| Compiler isolation | Compile and run `hello.c` | PASS; executable linked and ran successfully |
-| CLI build | Strict C11 build to `build\MemPredictC_CLI.exe` | PASS |
-| GUI build | Strict C11 build with `-luser32 -lgdi32` | PASS |
-| Makefile build | `C:\MinGW\bin\mingw32-make.exe -B` | PASS |
-| CLI regression | `build\MemPredictC_CLI.exe < tests\sample_inputs.txt` | PASS; demo, prediction, leak report, and cleanup observed |
-| GUI startup | Launch `build\MemPredictC.exe` | PASS; window remained running during startup check |
-| Screenshot | Capture running dashboard | PASS; [MemPredictC-dashboard.png](../screenshots/MemPredictC-dashboard.png) |
+| Compiler diagnosis | `C:\MinGW\bin\gcc.exe -v` | PASS; GCC 6.3.0 present |
+| Compiler isolation | Compile and run temporary `hello.c` | PASS; `MemPredictC compiler test successful!` |
+| CLI build | `build.bat` strict C11 CLI target | PASS; `build\MemPredictC_CLI.exe` generated |
+| GUI build | `build.bat` with `-mwindows -luser32 -lgdi32` | PASS; `build\MemPredictC.exe` generated |
+| Makefile build | `C:\MinGW\bin\mingw32-make.exe -B` | PASS; both targets rebuilt |
+| CLI regression | `build\MemPredictC_CLI.exe < tests\sample_inputs.txt` | PASS; exit code 0; demo, prediction, leak report, invalid ID, and cleanup observed |
+| GUI startup | Launch `build\MemPredictC.exe` | PASS; window handle present and title `MemPredictC | Memory Monitoring & Prediction` |
+| GUI subsystem | `objdump -p build\MemPredictC.exe` | PASS; `Subsystem 00000002 (Windows GUI)` |
+| Screenshot | Existing dashboard capture | PASS; [MemPredictC-dashboard.png](../screenshots/MemPredictC-dashboard.png) |
 
 Both executables were copied to `release\`. The current toolchain is
 32-bit MinGW GCC 6.3.0; the dashboard uses only system Win32 libraries.
 
 ## Compiler warnings and known issues
 
-The initial failures occurred because `gcc` was not on the shell `PATH`, and
-the first GUI build also exposed source compatibility issues (`_strtoui64`,
-missing `ULONG_MAX`, and `%zu` diagnostics in the legacy MinGW runtime). The
-build script now detects `C:\MinGW\bin` automatically, and the GUI uses
-standard `strtoull`, `<limits.h>`, and portable explicit formatting.
+The initial failure was caused by `gcc` not being on the shell `PATH`, even
+though `C:\MinGW\bin\gcc.exe` was installed. `build.bat` now checks that
+absolute path first and adds its directory to the child build environment. The
+GUI target uses the native Windows subsystem and links `USER32` and `GDI32`.
+
+## UI redesign validation (2026-11-17)
+
+The Win32 presentation layer was redesigned without changing `memory.c`,
+`memory.h`, `predictor.c`, or `predictor.h`.
+
+| UI check | Result |
+|---|---|
+| Empty dashboard state | PASS; displays “No memory activity yet” and guidance |
+| Dashboard statistics and graph | PASS; values updated from the engine after demo |
+| Allocations page | PASS; malloc allocation appeared in the active table |
+| Prediction page | PASS; trend graph, average growth, projection, and explanation visible |
+| Leak Detection page | PASS; active IDs and outstanding bytes visible |
+| Activity Log page | PASS; chronological engine events visible |
+| Settings page | PASS; C11 engine status and tracking boundary visible |
+| Navigation buttons | PASS; all six pages opened |
+| Automatic demonstration | PASS; dashboard updated to 1164 current bytes and 3 active allocations |
+| Resize check | PASS; tested at 1270px width and maximized 2582x1550 client size without clipping |
+| GUI startup | PASS; native window initialized with expected title |
+| CLI fallback | PASS; scripted regression exit code 0 after UI rebuild |
+
+Screenshots were captured during the live UI validation session. The checked-in
+image at [screenshots/MemPredictC-dashboard.png](../screenshots/MemPredictC-dashboard.png)
+is retained as the repository screenshot reference; the live validation also
+confirmed the redesigned dashboard and page states at runtime.
